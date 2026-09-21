@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Achievements</title>
+</head>
+<body>
+  <h1>Manage Student Achievements</h1>
+  <a href="/teacher-dashboard">Back to Dashboard</a>
+
+  <h2>Add Achievement</h2>
+  <form action="/teacher/achievements/add" method="POST">
+    <label>Student:
+      <select name="studentId" required>
+        <% students.forEach(function(s){ %>
+          <option value="<%= s.university_id %>"><%= s.name %> (<%= s.university_id %>)</option>
+        <% }); %>
+      </select>
+    </label>
+    <label>Title:
+      <input type="text" name="title" required>
+    </label>
+    <label>Description:
+      <input type="text" name="description">
+    </label>
+    <label>Date:
+      <input type="date" name="dateAchieved" required>
+    </label>
+    <button type="submit">Add</button>
+  </form>
+
+  <h2>All Achievements</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>Student</th><th>Title</th><th>Description</th><th>Date</th><th></th></tr>
+    <% achievements.forEach(function(a){ %>
+      <tr>
+        <td><%= a.student_name %></td>
+        <td><%= a.title %></td>
+        <td><%= a.description %></td>
+        <td><%= a.date_achieved %></td>
+        <td>
+          <form action="/teacher/achievements/delete/<%= a.id %>" method="POST" style="display:inline">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }); %>
+  </table>
+</body>
+</html>

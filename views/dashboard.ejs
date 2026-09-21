@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #14100D;
+    --red: #B3211E;
+    --gold: #E8B923;
+    --cream: #FDF8F0;
+    --ink: #1B1614;
+    --muted: #7A6F63;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+
+  nav {
+    background: var(--dark);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 3px solid var(--gold);
+  }
+  nav .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  nav .brand img { width: 32px; height: 32px; border-radius: 50%; }
+  nav .logout {
+    background: var(--red);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+  .welcome h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+  }
+  .welcome p { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 28px 0 36px;
+  }
+  .info-box {
+    background: white;
+    border: 1px solid #EAE1D3;
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .info-box .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-box .value { font-size: 17px; font-weight: 600; margin-top: 4px; }
+
+  .quick-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+  }
+  .link-card {
+    background: white;
+    border: 1px solid #EAE1D3;
+    border-top: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 26px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .link-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+  .link-card .icon { font-size: 24px; margin-bottom: 8px; }
+  .link-card h3 { font-size: 14px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+  <nav>
+    <div class="brand">
+      <img src="/images/college-crest.png" alt="Crest">
+      <%= collegeName %>
+    </div>
+    <a href="/logout" class="logout">Log Out</a>
+  </nav>
+
+  <div class="container">
+<div class="welcome">
+  <h1>Welcome, <%= student.name %></h1>
+  <p><%= student.branch_name %> · <%= student.section_name ? 'Year ' + student.section_year + ', Section ' + student.section_name : 'Section not assigned yet' %> · Class of <%= student.joining_year + 4 %> · <%= student.admission_type %></p>
+</div>
+
+<div class="info-grid">
+  <div class="info-box">
+    <div class="label">University ID</div>
+    <div class="value"><%= student.university_id %></div>
+  </div>
+  <div class="info-box">
+    <div class="label">Section</div>
+    <div class="value"><%= student.section_name ? 'Year ' + student.section_year + ' - ' + student.section_name : 'Not assigned yet' %></div>
+  </div>
+  <div class="info-box">
+    <div class="label">Branch</div>
+    <div class="value"><%= student.branch_name %></div>
+  </div>
+  <div class="info-box">
+    <div class="label">Admission Type</div>
+    <div class="value"><%= student.admission_type %></div>
+  </div>
+  <div class="info-box">
+    <div class="label">Student Phone</div>
+    <div class="value"><%= student.student_phone %></div>
+  </div>
+  <div class="info-box">
+    <div class="label">Parent Phone</div>
+    <div class="value"><%= student.parent_phone %></div>
+  </div>
+  <div class="info-box" style="grid-column: 1 / -1;">
+    <div class="label">Address</div>
+    <div class="value"><%= student.address %></div>
+  </div>
+</div>
+
+<h2 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 14px;">Academic Record</h2>
+
+<% if (marks.length === 0) { %>
+  <div class="info-box" style="margin-bottom: 36px;">
+    <p style="color: var(--muted); font-size: 14px;">No marks recorded yet.</p>
+  </div>
+<% } else { %>
+  <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #EAE1D3; border-radius: 8px; overflow: hidden; margin-bottom: 36px;">
+    <thead>
+      <tr style="background: var(--dark); color: white;">
+        <th style="padding: 12px; text-align: left; font-size: 13px;">Subject</th>
+        <th style="padding: 12px; text-align: left; font-size: 13px;">Semester</th>
+<th style="padding: 12px; text-align: left; font-size: 13px;">Score</th>
+        <th style="padding: 12px; text-align: left; font-size: 13px;">Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% marks.forEach(m => { %>
+        <tr style="border-top: 1px solid #EAE1D3;">
+          <td style="padding: 12px; font-size: 14px;"><%= m.subject_name %></td>
+          <td style="padding: 12px; font-size: 14px;"><%= m.semester %></td>
+<td style="padding: 12px; font-size: 14px; font-weight: 600;"><%= m.score %> / <%= m.max_score %></td>
+          <td style="padding: 12px; font-size: 14px; font-weight: 700; color: var(--red);"><%= m.grade %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+    <div class="quick-links">
+      <a href="/timetable" class="link-card">
+        <div class="icon">📅</div>
+        <h3>Timetable</h3>
+      </a>
+      <a href="/fees" class="link-card">
+        <div class="icon">💳</div>
+        <h3>Fees</h3>
+      </a>
+      <a href="/achievements" class="link-card">
+        <div class="icon">🏆</div>
+        <h3>Achievements</h3>
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faculty Dashboard — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+  nav { background: var(--dark); color: white; display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; border-bottom: 3px solid var(--red); }
+  nav .logout { background: var(--red); color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-size: 13px; font-weight: 600; }
+  .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; }
+  .role-badge { display: inline-block; background: var(--gold); color: var(--dark); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px; margin-left: 10px; text-transform: uppercase; }
+  .assignment { display: block; background: white; border: 1px solid #EAE1D3; border-left: 4px solid var(--red); border-radius: 6px; padding: 16px 20px; margin-top: 14px; text-decoration: none; color: var(--ink); cursor: pointer; }
+  .assignment:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+  .assignment .subj { font-weight: 600; font-size: 15px; }
+  .assignment .meta { color: var(--muted); font-size: 13px; margin-top: 3px; }
+</style>
+</head>
+<body>
+  <nav>
+    <div>Faculty Portal</div>
+    <a href="/teacher-logout" class="logout">Log Out</a>
+  </nav>
+  <div class="container">
+    <h1>Welcome, <%= teacher.name %><% if (teacher.role === 'incharge') { %><span class="role-badge">Incharge</span><% } %></h1>
+    <p style="color: var(--muted); margin-top: 6px;">Click a class to enter marks:</p>
+
+    <% assignments.forEach(a => { %>
+      <a href="/teacher/marks/<%= a.section_id %>/<%= a.subject_id %>" class="assignment">
+        <div class="subj"><%= a.subject_name %></div>
+        <div class="meta"><%= a.branch_name %> · Year <%= a.year %>, Section <%= a.section_name %></div>
+      </a>
+    <% }) %>
+  </div>
+  <a href="/teacher/achievements">Manage Achievements</a>
+</body>
+</html>

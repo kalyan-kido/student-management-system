@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timetable — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
+  nav { background: var(--dark); color: white; padding: 16px 28px; border-bottom: 3px solid var(--gold); display:flex; justify-content:space-between; align-items:center; }
+  nav a { color: var(--gold); text-decoration: none; font-size: 13px; }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+  th { background: var(--dark); color: white; padding: 12px; font-size: 12px; text-transform: uppercase; }
+  td { padding: 0; border: 1px solid #EAE1D3; }
+  .period-cell {
+    padding: 14px; cursor: pointer; transition: background 0.15s ease; min-height: 60px;
+  }
+  .period-cell:hover { background: #FCF3D9; }
+  .period-cell .subj { font-weight: 600; font-size: 13px; }
+  .period-cell .teach { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .empty-cell { padding: 14px; color: #C9C0B2; font-size: 12px; }
+
+  /* Modal */
+  #overlay { position: fixed; inset: 0; background: rgba(20,16,13,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
+  #overlay.show { display: flex; }
+  #modal { background: white; border-radius: 10px; padding: 28px; max-width: 380px; width: 90%; border-top: 4px solid var(--gold); }
+  #modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 6px; }
+  #modal .teacher { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  #modal .topic { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #EAE1D3; font-size: 13px; }
+  #modal .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .badge.covered { background: #E7F5E9; color: #2E7D32; }
+  .badge.pending { background: #FDECEA; color: var(--red); }
+  #modal .close-btn { margin-top: 18px; width: 100%; padding: 10px; background: var(--dark); color: white; border: none; border-radius: 6px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div>Timetable</div>
+  <a href="/dashboard">← Back to Dashboard</a>
+</nav>
+
+<div class="container">
+  <h1>Weekly Schedule</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (let p = 1; p <= 4; p++) { %>
+        <tr>
+          <td style="background:var(--dark); color:white; text-align:center; font-weight:600;">P<%= p %></td>
+          <% ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(day => { %>
+            <%
+              const entry = timetable.find(t => t.day_of_week === day && t.period_number === p);
+            %>
+            <td>
+              <% if (entry) { %>
+                <div class="period-cell" onclick="showDetails('<%= entry.subject_name %>', '<%= entry.teacher_name %>', <%= entry.subject_id %>)">
+                  <div class="subj"><%= entry.subject_name %></div>
+                  <div class="teach"><%= entry.teacher_name %></div>
+                </div>
+              <% } else { %>
+                <div class="empty-cell">—</div>
+              <% } %>
+            </td>
+          <% }) %>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<div id="overlay">
+  <div id="modal">
+    <h2 id="modalSubject"></h2>
+    <div class="teacher" id="modalTeacher"></div>
+    <div id="syllabusList"></div>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+  async function showDetails(subject, teacher, subjectId) {
+    document.getElementById('modalSubject').textContent = subject;
+    document.getElementById('modalTeacher').textContent = 'Faculty: ' + teacher;
+
+    const res = await fetch('/api/subject/' + subjectId + '/syllabus');
+    const syllabus = await res.json();
+
+    const list = document.getElementById('syllabusList');
+    list.innerHTML = syllabus.map(s => `
+      <div class="topic">
+        <span>${s.topic}</span>
+        <span class="badge ${s.is_covered ? 'covered' : 'pending'}">${s.is_covered ? 'Covered' : 'Pending'}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+</script>
+
+</body>
+</html>
