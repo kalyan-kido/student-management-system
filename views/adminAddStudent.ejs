@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Student — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); }
+  nav { background:var(--dark); color:white; display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:3px solid var(--gold); }
+  .container { max-width:500px; margin:60px auto; padding:0 20px; }
+  h1 { font-family:'Cormorant Garamond', serif; font-size:28px; margin-bottom:24px; }
+  form { background:white; border:1px solid #EAE1D3; border-radius:8px; padding:28px; }
+  label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; margin-top:16px; }
+  input { width:100%; padding:10px 12px; border:1px solid #DCD2C2; border-radius:5px; font-size:14px; }
+  button { margin-top:24px; width:100%; background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:600; cursor:pointer; }
+  .error { background:#FBEAEA; color:var(--red); padding:10px; border-radius:5px; font-size:13px; margin-bottom:10px; }
+  .back-link { display:inline-block; margin-bottom:20px; color:var(--muted); text-decoration:none; font-size:13px; }
+</style>
+</head>
+<body>
+  <nav><div><%= collegeName %></div><a href="/teacher-logout" style="color:white">Log Out</a></nav>
+  <div class="container">
+    <a href="/admin-dashboard" class="back-link">&larr; Back to Admin Dashboard</a>
+    <h1>Add Student</h1>
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <form method="POST" action="/admin/add-student">
+      <label>Full Name</label>
+      <input type="text" name="name" required>
+      <label>University ID</label>
+      <input type="text" name="universityId" required placeholder="e.g. 23Q71A05I5">
+      <label>Email</label>
+      <input type="email" name="email" required>
+      <label>Temporary Password</label>
+      <input type="password" name="password" required>
+      <button type="submit">Create Student Account</button>
+    </form>
+  </div>
+</body>
+</html>

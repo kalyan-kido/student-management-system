@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Activities — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); }
+  nav { background:var(--dark); color:white; display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:3px solid var(--gold); }
+  .container { max-width:900px; margin:0 auto; padding:40px 20px; }
+  h1 { font-family:'Cormorant Garamond', serif; font-size:28px; margin-bottom:24px; }
+  .back-link { display:inline-block; margin-bottom:20px; color:var(--muted); text-decoration:none; font-size:13px; }
+  form.stack { background:white; border:1px solid #EAE1D3; border-radius:8px; padding:18px; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; align-items:end; margin-bottom:28px; }
+  form.stack label { display:block; font-size:13px; font-weight:500; margin-bottom:4px; }
+  form.stack input, form.stack select { width:100%; padding:10px; border:1px solid #DCD2C2; border-radius:5px; font-size:14px; }
+  button { background:var(--red); color:white; border:none; padding:11px 16px; border-radius:6px; font-weight:600; cursor:pointer; }
+  table { width:100%; border-collapse:collapse; background:white; border:1px solid #EAE1D3; border-radius:8px; overflow:hidden; }
+  th { background:var(--dark); color:white; padding:12px; text-align:left; font-size:12px; }
+  td { padding:10px 12px; border-top:1px solid #EAE1D3; font-size:14px; }
+  .muted { color:var(--muted); }
+</style>
+</head>
+<body>
+  <nav><div><%= collegeName %></div><a href="/teacher-logout" style="color:white">Log Out</a></nav>
+  <div class="container">
+    <a href="/teacher-dashboard" class="back-link">&larr; Back to Dashboard</a>
+    <h1>Activities</h1>
+
+    <form class="stack" method="POST" action="/teacher/activities/add">
+      <div>
+        <label>Section</label>
+        <select name="sectionId" required>
+          <option value="" disabled selected>Choose a section</option>
+          <% sections.forEach(function(s) { %>
+            <option value="<%= s.id %>"><%= s.branch_name %>, Year <%= s.year %>, Section <%= s.section_name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div>
+        <label>Title</label>
+        <input type="text" name="title" required>
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" name="date" required>
+      </div>
+      <div>
+        <label>Description</label>
+        <input type="text" name="description">
+      </div>
+      <div>
+        <button type="submit">Add Activity</button>
+      </div>
+    </form>
+
+    <table>
+      <thead><tr><th>Section</th><th>Title</th><th>Date</th><th class="muted">Description</th></tr></thead>
+      <tbody>
+        <% if (activities.length === 0) { %>
+          <tr><td colspan="4" class="muted">No activities recorded yet.</td></tr>
+        <% } %>
+        <% activities.forEach(function(a) { %>
+          <tr>
+            <td><%= a.branch_name %>, Year <%= a.year %>, Section <%= a.section_name %></td>
+            <td><%= a.title %></td>
+            <td><%= a.date %></td>
+            <td class="muted"><%= a.description %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

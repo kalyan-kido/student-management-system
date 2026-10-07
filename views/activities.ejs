@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Activities — <%= collegeName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter', sans-serif; background:var(--cream); color:var(--ink); }
+  nav { background:var(--dark); color:white; display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:3px solid var(--gold); }
+  .container { max-width:900px; margin:0 auto; padding:40px 20px; }
+  h1 { font-family:'Cormorant Garamond', serif; font-size:30px; margin-bottom:24px; }
+  .back-link { display:inline-block; margin-bottom:20px; color:var(--muted); text-decoration:none; font-size:13px; }
+  .activity-card { background:white; border:1px solid #EAE1D3; border-left:4px solid var(--gold); border-radius:8px; padding:20px; margin-bottom:16px; }
+  .activity-card h3 { font-family:'Cormorant Garamond', serif; font-size:19px; margin-bottom:6px; }
+  .activity-card .date { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .empty-box { background:white; border:1px solid #EAE1D3; border-radius:8px; padding:30px; text-align:center; color:var(--muted); font-size:14px; }
+</style>
+</head>
+<body>
+  <nav><div><%= collegeName %></div><a href="/logout" style="color:white">Log Out</a></nav>
+  <div class="container">
+    <a href="/dashboard" class="back-link">&larr; Back to Dashboard</a>
+    <h1>Activities</h1>
+    <% if (activities.length === 0) { %>
+      <div class="empty-box"><p>No activities recorded yet.</p></div>
+    <% } else { %>
+      <% activities.forEach(function(a) { %>
+        <div class="activity-card">
+          <h3><%= a.title %></h3>
+          <div class="date"><%= a.date %></div>
+          <% if (a.description) { %><p><%= a.description %></p><% } %>
+        </div>
+      <% }); %>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -73,8 +73,8 @@ app.get('/dashboard', (req, res) => {
     SELECT students.*, branches.name AS branch_name, 
            sections.section_name, sections.year AS section_year
     FROM students
-    LEFT JOIN branches ON students.branch_code = branches.code
-    LEFT JOIN sections ON students.section_id = sections.id
+    JOIN branches ON students.branch_code = branches.code
+    JOIN sections ON students.section_id = sections.id
     WHERE students.university_id = ?
   `).get(req.session.student.universityId);
 
@@ -267,6 +267,10 @@ app.get('/admin-dashboard', requireAdmin, (req, res) => {
     WHERE section_id IS NULL
   `).all();
 
+  const allStudents = db.prepare(`
+    SELECT university_id, name, email FROM students ORDER BY name
+  `).all();
+
   const sections = db.prepare(`
     SELECT sections.id, sections.section_name, sections.year, sections.incharge_id,
            branches.name AS branch_name
@@ -282,6 +286,8 @@ app.get('/admin-dashboard', requireAdmin, (req, res) => {
     SELECT id, name, branch_code, year FROM subjects
   `).all();
 
+  const branches = db.prepare(`SELECT * FROM branches`).all();
+
   const currentAssignments = db.prepare(`
     SELECT section_subjects.id, sections.section_name, sections.year,
            subjects.name AS subject_name, teachers.name AS teacher_name
@@ -295,9 +301,11 @@ app.get('/admin-dashboard', requireAdmin, (req, res) => {
     collegeName: COLLEGE_NAME,
     admin: req.session.teacher,
     unassignedStudents,
+    allStudents,
     sections,
     teachers,
     subjects,
+    branches,
     currentAssignments
   });
 });
@@ -322,6 +330,69 @@ app.post('/admin/set-incharge', requireAdmin, (req, res) => {
   const { sectionId, teacherId } = req.body;
   db.prepare('UPDATE sections SET incharge_id = ? WHERE id = ?')
     .run(teacherId, sectionId);
+  res.redirect('/admin-dashboard');
+});
+
+// ---------- Add Student (admin) ----------
+app.get('/admin/add-student', requireAdmin, (req, res) => {
+  res.render('adminAddStudent', {
+    collegeName: COLLEGE_NAME,
+    admin: req.session.teacher,
+    error: null
+  });
+});
+
+app.post('/admin/add-student', requireAdmin, async (req, res) => {
+  const { email, password, name, universityId } = req.body;
+
+  const existing = db.prepare('SELECT * FROM students WHERE email = ? OR university_id = ?')
+    .get(email, universityId);
+
+  if (existing) {
+    return res.render('adminAddStudent', {
+      collegeName: COLLEGE_NAME,
+      admin: req.session.teacher,
+      error: 'A student with that email or university ID already exists.'
+    });
+  }
+
+  const hashed = await bcrypt.hash(password, 10);
+
+  db.prepare(`
+    INSERT INTO students (email, password, name, university_id)
+    VALUES (?, ?, ?, ?)
+  `).run(email, hashed, name, universityId);
+
+  res.redirect('/admin-dashboard');
+});
+
+// ---------- Edit Student (admin) ----------
+app.get('/admin/edit-student/:universityId', requireAdmin, (req, res) => {
+  const student = db.prepare('SELECT * FROM students WHERE university_id = ?')
+    .get(req.params.universityId);
+  if (!student) return res.redirect('/admin-dashboard');
+
+  const branches = db.prepare('SELECT * FROM branches').all();
+  const sections = db.prepare('SELECT * FROM sections').all();
+
+  res.render('adminEditStudent', {
+    collegeName: COLLEGE_NAME,
+    admin: req.session.teacher,
+    student,
+    branches,
+    sections
+  });
+});
+
+app.post('/admin/edit-student/:universityId', requireAdmin, (req, res) => {
+  const { name, address, parentPhone, studentPhone, branchCode, sectionId } = req.body;
+
+  db.prepare(`
+    UPDATE students
+    SET name = ?, address = ?, parent_phone = ?, student_phone = ?, branch_code = ?, section_id = ?
+    WHERE university_id = ?
+  `).run(name, address, parentPhone, studentPhone, branchCode || null, sectionId || null, req.params.universityId);
+
   res.redirect('/admin-dashboard');
 });
 
@@ -373,13 +444,9 @@ app.post('/teacher/achievements/delete/:id', (req, res) => {
 app.get('/achievements', (req, res) => {
   if (!req.session.student) return res.redirect('/login');
 
-  console.log('DEBUG session:', req.session.student);
-
   const achievements = db.prepare(`
     SELECT * FROM achievements WHERE student_id = ? ORDER BY date_achieved DESC
   `).all(req.session.student.universityId);
-
-  console.log('DEBUG achievements found:', achievements);
 
   res.render('achievements', {
     collegeName: COLLEGE_NAME,
@@ -388,16 +455,225 @@ app.get('/achievements', (req, res) => {
   });
 });
 
-// ---------- Fees (placeholder) ----------
-app.get('/fees', (req, res) => {
-  if (!req.session.student) return res.redirect('/login');
-  res.send('<h1>Fees</h1><p>Coming soon.</p><a href="/dashboard">Back to dashboard</a>');
+// ---------- Activities (teacher side) ----------
+app.get('/teacher/activities', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const students = db.prepare(`SELECT university_id, name FROM students ORDER BY name`).all();
+  const activities = db.prepare(`
+    SELECT activities.*, students.name AS student_name
+    FROM activities
+    JOIN students ON activities.student_id = students.university_id
+    ORDER BY activities.date DESC
+  `).all();
+
+  res.render('teacherActivities', {
+    collegeName: COLLEGE_NAME,
+    teacher: req.session.teacher,
+    students,
+    activities
+  });
 });
 
+app.post('/teacher/activities/add', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const { studentId, title, description, date } = req.body;
+
+  db.prepare(`
+    INSERT INTO activities (student_id, title, description, date)
+    VALUES (?, ?, ?, ?)
+  `).run(studentId, title, description, date);
+
+  res.redirect('/teacher/activities');
+});
+
+// ---------- Activities (student side) ----------
+app.get('/activities', (req, res) => {
+  if (!req.session.student) return res.redirect('/login');
+
+  const activities = db.prepare(`
+    SELECT * FROM activities WHERE student_id = ? ORDER BY date DESC
+  `).all(req.session.student.universityId);
+
+  res.render('activities', {
+    collegeName: COLLEGE_NAME,
+    student: req.session.student,
+    activities
+  });
+});
+// ---------- Add Teacher (admin) ----------
+app.get('/admin/add-teacher', requireAdmin, (req, res) => {
+  res.render('adminAddTeacher', {
+    collegeName: COLLEGE_NAME,
+    admin: req.session.teacher,
+    error: null
+  });
+});
+
+app.post('/admin/add-teacher', requireAdmin, async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const existing = db.prepare('SELECT * FROM teachers WHERE email = ?').get(email);
+  if (existing) {
+    return res.render('adminAddTeacher', {
+      collegeName: COLLEGE_NAME,
+      admin: req.session.teacher,
+      error: 'A teacher with that email already exists.'
+    });
+  }
+
+  const hashed = await bcrypt.hash(password, 10);
+
+  db.prepare(`
+    INSERT INTO teachers (name, email, password, role)
+    VALUES (?, ?, ?, 'teacher')
+  `).run(name, email, hashed);
+
+  res.redirect('/admin-dashboard');
+});
+
+// ---------- Add Subject (admin) ----------
+app.post('/admin/add-subject', requireAdmin, (req, res) => {
+  const { name, branchCode, year } = req.body;
+
+  db.prepare(`
+    INSERT INTO subjects (name, branch_code, year)
+    VALUES (?, ?, ?)
+  `).run(name, branchCode, year);
+
+  res.redirect('/admin-dashboard');
+});
+
+// ---------- Add Section (admin) ----------
+app.post('/admin/add-section', requireAdmin, (req, res) => {
+  const { sectionName, year, branchCode } = req.body;
+
+  db.prepare(`
+    INSERT INTO sections (section_name, year, branch_code)
+    VALUES (?, ?, ?)
+  `).run(sectionName, year, branchCode);
+
+  res.redirect('/admin-dashboard');
+});
+// ---------- Add Branch (admin) ----------
+app.post('/admin/add-branch', requireAdmin, (req, res) => {
+  const { code, name } = req.body;
+
+  db.prepare(`
+    INSERT INTO branches (code, name)
+    VALUES (?, ?)
+  `).run(code, name);
+
+  res.redirect('/admin-dashboard');
+});
+// ---------- Activities (teacher side) ----------
+app.get('/teacher/activities', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const sections = db.prepare(`
+    SELECT sections.id, sections.section_name, sections.year, branches.name AS branch_name
+    FROM sections
+    JOIN branches ON sections.branch_code = branches.code
+  `).all();
+
+  const activities = db.prepare(`
+    SELECT activities.*, sections.section_name, sections.year, branches.name AS branch_name
+    FROM activities
+    JOIN sections ON activities.section_id = sections.id
+    JOIN branches ON sections.branch_code = branches.code
+    ORDER BY activities.date DESC
+  `).all();
+
+  res.render('teacherActivities', {
+    collegeName: COLLEGE_NAME,
+    teacher: req.session.teacher,
+    sections,
+    activities
+  });
+});
+
+app.post('/teacher/activities/add', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const { sectionId, title, description, date } = req.body;
+
+  db.prepare(`
+    INSERT INTO activities (section_id, title, description, date)
+    VALUES (?, ?, ?, ?)
+  `).run(sectionId, title, description, date);
+
+  res.redirect('/teacher/activities');
+});
+
+// ---------- Activities (student side) ----------
+app.get('/activities', (req, res) => {
+  if (!req.session.student) return res.redirect('/login');
+
+  const activities = db.prepare(`
+    SELECT * FROM activities WHERE section_id = ? ORDER BY date DESC
+  `).all(req.session.student.sectionId);
+
+  res.render('activities', {
+    collegeName: COLLEGE_NAME,
+    student: req.session.student,
+    activities
+  });
+});
+// ---------- Activities (teacher side) ----------
+app.get('/teacher/activities', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const sections = db.prepare(`
+    SELECT sections.id, sections.section_name, sections.year, branches.name AS branch_name
+    FROM sections
+    JOIN branches ON sections.branch_code = branches.code
+  `).all();
+
+  const activities = db.prepare(`
+    SELECT activities.*, sections.section_name, sections.year, branches.name AS branch_name
+    FROM activities
+    JOIN sections ON activities.section_id = sections.id
+    JOIN branches ON sections.branch_code = branches.code
+    ORDER BY activities.date DESC
+  `).all();
+
+  res.render('teacherActivities', {
+    collegeName: COLLEGE_NAME,
+    teacher: req.session.teacher,
+    sections,
+    activities
+  });
+});
+
+app.post('/teacher/activities/add', (req, res) => {
+  if (!req.session.teacher) return res.redirect('/teacher-login');
+
+  const { sectionId, title, description, date } = req.body;
+
+  db.prepare(`
+    INSERT INTO activities (section_id, title, description, date)
+    VALUES (?, ?, ?, ?)
+  `).run(sectionId, title, description, date);
+
+  res.redirect('/teacher/activities');
+});
+
+// ---------- Activities (student side) ----------
+app.get('/activities', (req, res) => {
+  if (!req.session.student) return res.redirect('/login');
+
+  const activities = db.prepare(`
+    SELECT * FROM activities WHERE section_id = ? ORDER BY date DESC
+  `).all(req.session.student.sectionId);
+
+  res.render('activities', {
+    collegeName: COLLEGE_NAME,
+    student: req.session.student,
+    activities
+  });
+});
 // ---------- Start server ----------
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-
-
-

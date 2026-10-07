@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -51,7 +51,10 @@
 <nav>
   <div class="brand"><%= collegeName %></div>
   <div class="links">
+    <a href="/admin/add-student">Add Student</a>
+    <a href="/admin/add-teacher">Add Teacher</a>
     <a href="/teacher/achievements">Achievements</a>
+    <a href="/teacher/activities">Activities</a>
     <a href="/teacher-logout">Log out</a>
   </div>
 </nav>
@@ -100,6 +103,137 @@
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section class="block">
+    <h2>All students</h2>
+    <p class="hint">Edit any student's personal details.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Student</th><th>University ID</th><th>Email</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% if (allStudents.length === 0) { %>
+            <tr><td class="empty" colspan="4">No students yet.</td></tr>
+          <% } %>
+          <% allStudents.forEach(st => { %>
+            <tr>
+              <td><%= st.name %></td>
+              <td><%= st.university_id %></td>
+              <td class="muted"><%= st.email %></td>
+              <td><a href="/admin/edit-student/<%= st.university_id %>">Edit</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Add a branch</h2>
+    <p class="hint">Create a branch before adding subjects or sections for it.</p>
+    <form class="stack" method="POST" action="/admin/add-branch">
+      <div>
+        <label for="b-code">Branch code</label>
+        <input id="b-code" name="code" type="text" placeholder="e.g. CSE" required>
+      </div>
+      <div>
+        <label for="b-name">Branch name</label>
+        <input id="b-name" name="name" type="text" placeholder="e.g. Computer Science Engineering" required>
+      </div>
+      <div>
+        <button type="submit">Add branch</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="block">
+    <h2>All branches</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Code</th><th>Name</th></tr>
+        </thead>
+        <tbody>
+          <% if (branches.length === 0) { %>
+            <tr><td class="empty" colspan="2">No branches yet. Add one above.</td></tr>
+          <% } %>
+          <% branches.forEach(b => { %>
+            <tr>
+              <td><%= b.code %></td>
+              <td><%= b.name %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Add a subject</h2>
+    <p class="hint">Create a subject for a branch and year before assigning it to a teacher.</p>
+    <form class="stack" method="POST" action="/admin/add-subject">
+      <div>
+        <label for="s-name">Subject name</label>
+        <input id="s-name" name="name" type="text" required>
+      </div>
+      <div>
+        <label for="s-branch">Branch</label>
+        <select id="s-branch" name="branchCode" required>
+          <option value="" disabled selected>Choose a branch</option>
+          <% branches.forEach(b => { %>
+            <option value="<%= b.code %>"><%= b.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label for="s-year">Year</label>
+        <select id="s-year" name="year" required>
+          <option value="" disabled selected>Choose a year</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit">Add subject</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="block">
+    <h2>Add a class section</h2>
+    <p class="hint">Create a section (e.g. Year 2, Section A) before assigning students or teachers to it.</p>
+    <form class="stack" method="POST" action="/admin/add-section">
+      <div>
+        <label for="sec-name">Section name</label>
+        <input id="sec-name" name="sectionName" type="text" placeholder="e.g. A" required>
+      </div>
+      <div>
+        <label for="sec-branch">Branch</label>
+        <select id="sec-branch" name="branchCode" required>
+          <option value="" disabled selected>Choose a branch</option>
+          <% branches.forEach(b => { %>
+            <option value="<%= b.code %>"><%= b.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label for="sec-year">Year</label>
+        <select id="sec-year" name="year" required>
+          <option value="" disabled selected>Choose a year</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit">Add section</button>
+      </div>
+    </form>
   </section>
 
   <section class="block">
@@ -202,3 +336,8 @@
 </div>
 </body>
 </html>
+
+
+
+
+
