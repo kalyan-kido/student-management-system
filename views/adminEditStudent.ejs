@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -33,17 +33,20 @@
       <label>Student Phone</label>
       <input type="text" name="studentPhone" value="<%= student.student_phone || '' %>">
       <label>Branch</label>
-      <select name="branchCode">
+      <input type="text" value="<%= (branches.find(function(b) { return b.code === student.branch_code; }) || {}).name || 'Not set' %>" disabled>
+      <% var cur = sections.find(function(s) { return s.id === student.section_id; }); %>
+      <label>Year</label>
+      <select name="year">
         <option value="">— Select —</option>
-        <% branches.forEach(function(b) { %>
-          <option value="<%= b.code %>" <%= student.branch_code === b.code ? 'selected' : '' %>><%= b.name %></option>
+        <% [1, 2, 3, 4].forEach(function(y) { %>
+          <option value="<%= y %>" <%= cur && cur.year === y ? 'selected' : '' %>>Year <%= y %></option>
         <% }); %>
       </select>
       <label>Section</label>
-      <select name="sectionId">
+      <select name="sectionName">
         <option value="">— Select —</option>
-        <% sections.forEach(function(s) { %>
-          <option value="<%= s.id %>" <%= student.section_id === s.id ? 'selected' : '' %>><%= s.section_name %></option>
+        <% ['A','B','C','D','E','F','G','H','I','J'].forEach(function(s) { %>
+          <option value="<%= s %>" <%= cur && cur.section_name === s ? 'selected' : '' %>>Section <%= s %></option>
         <% }); %>
       </select>
       <button type="submit">Save Changes</button>

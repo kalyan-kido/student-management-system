@@ -399,13 +399,32 @@ app.get('/admin/edit-student/:universityId', requireAdmin, (req, res) => {
 });
 
 app.post('/admin/edit-student/:universityId', requireAdmin, (req, res) => {
-  const { name, address, parentPhone, studentPhone, branchCode, sectionId } = req.body;
+  const { name, address, parentPhone, studentPhone, year, sectionName } = req.body;
+  const id = req.params.universityId;
+
+  const student = db.prepare('SELECT branch_code, section_id FROM students WHERE university_id = ?').get(id);
+  if (!student) return res.redirect('/admin-dashboard');
+
+  if ((year && !sectionName) || (!year && sectionName)) {
+    return res.status(400).send('Please choose both a year and a section.');
+  }
+
+  let sectionId = student.section_id;
+  if (year && sectionName) {
+    const section = db.prepare(
+      'SELECT id FROM sections WHERE branch_code = ? AND year = ? AND section_name = ?'
+    ).get(student.branch_code, year, sectionName);
+    if (!section) {
+      return res.status(400).send('Year ' + year + ', Section ' + sectionName + ' does not exist for this branch.');
+    }
+    sectionId = section.id;
+  }
 
   db.prepare(`
     UPDATE students
-    SET name = ?, address = ?, parent_phone = ?, student_phone = ?, branch_code = ?, section_id = ?
+    SET name = ?, address = ?, parent_phone = ?, student_phone = ?, section_id = ?
     WHERE university_id = ?
-  `).run(name, address, parentPhone, studentPhone, branchCode || null, sectionId || null, req.params.universityId);
+  `).run(name, address, parentPhone, studentPhone, sectionId, id);
 
   res.redirect('/admin-dashboard');
 });
