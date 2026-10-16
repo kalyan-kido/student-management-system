@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -89,10 +89,17 @@
               <td>
                 <form class="row" method="POST" action="/admin/assign-section">
                   <input type="hidden" name="universityId" value="<%= st.university_id %>">
-                  <select name="sectionId" required aria-label="Section for <%= st.name %>">
-                    <option value="" disabled selected>Choose a section</option>
-                    <% sections.forEach(sec => { %>
-                      <option value="<%= sec.id %>"><%= sec.branch_name %>, Year <%= sec.year %>, Section <%= sec.section_name %></option>
+                  <% let guessYear = null; try { guessYear = parseId(st.university_id).studyYear; } catch (e) {} %>
+                  <select name="year" required aria-label="Year for <%= st.name %>">
+                    <option value="" disabled <%= guessYear ? '' : 'selected' %>>Year</option>
+                    <% [1, 2, 3, 4].forEach(y => { %>
+                      <option value="<%= y %>" <%= guessYear === y ? 'selected' : '' %>>Year <%= y %></option>
+                    <% }) %>
+                  </select>
+                  <select name="sectionName" required aria-label="Section for <%= st.name %>">
+                    <option value="" disabled selected>Section</option>
+                    <% ['A','B','C','D','E','F','G','H','I','J'].forEach(s => { %>
+                      <option value="<%= s %>">Section <%= s %></option>
                     <% }) %>
                   </select>
                   <button type="submit">Assign section</button>
@@ -195,6 +202,14 @@
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
+        </select>
+      </div>
+      <div>
+        <label for="s-semester">Semester</label>
+        <select id="s-semester" name="semester" required>
+          <option value="" disabled selected>Choose a semester</option>
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
         </select>
       </div>
       <div>

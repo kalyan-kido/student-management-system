@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -101,7 +101,7 @@
   <div class="container">
 <div class="welcome">
   <h1>Welcome, <%= student.name %></h1>
-  <p><%= student.branch_name %> · <%= student.section_name ? 'Year ' + student.section_year + ', Section ' + student.section_name : 'Section not assigned yet' %> · Class of <%= student.joining_year + 4 %> · <%= student.admission_type %></p>
+  <p><%= student.branch_name %> · <%= student.section_name ? 'Year ' + student.section_year + ', Section ' + student.section_name : 'Section not assigned yet' %> · <% const info = parseId(student.university_id); %><%= info.studyYear ? info.yearLabel + ' (Sem ' + info.semesterLabel + ')' : info.yearLabel %> · Class of <%= info.graduationYear %> · <%= student.admission_type %></p>
 </div>
 
 <div class="info-grid">

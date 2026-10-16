@@ -1,3 +1,10 @@
 node_modules/
 school.db
 .env
+*.db
+*_backup*.js
+*_backup*.ejs
+*_full.txt
+achievements_raw.html
+checkActivities.js
+node_modules

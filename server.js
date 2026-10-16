@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const db = require('./db');
@@ -6,6 +6,7 @@ const parseUniversityId = require('./idParser');
 const calculateGrade = require('./gradeHelper');
 
 const app = express();
+app.locals.parseId = require('./idParser');
 const PORT = 3000;
 const COLLEGE_NAME = 'Avanthi Institute of Engineering & Technology';
 
@@ -62,35 +63,6 @@ app.post('/login', async (req, res) => {
   };
 
   res.redirect('/dashboard');
-});
-
-app.get('/dashboard', (req, res) => {
-  if (!req.session.student) {
-    return res.redirect('/login');
-  }
-
-  const student = db.prepare(`
-    SELECT students.*, branches.name AS branch_name, 
-           sections.section_name, sections.year AS section_year
-    FROM students
-    JOIN branches ON students.branch_code = branches.code
-    JOIN sections ON students.section_id = sections.id
-    WHERE students.university_id = ?
-  `).get(req.session.student.universityId);
-
-  const marks = db.prepare(`
-    SELECT subjects.name AS subject_name, marks.semester, marks.score, marks.max_score, marks.grade
-    FROM marks
-    JOIN subjects ON marks.subject_id = subjects.id
-    WHERE marks.student_id = ?
-    ORDER BY marks.semester
-  `).all(req.session.student.universityId);
-
-  res.render('dashboard', {
-    collegeName: COLLEGE_NAME,
-    student: student,
-    marks: marks
-  });
 });
 
 app.get('/logout', (req, res) => {
@@ -310,6 +282,26 @@ app.get('/admin-dashboard', requireAdmin, (req, res) => {
   });
 });
 
+app.post('/admin/assign-section', requireAdmin, (req, res, next) => {
+  const { universityId, year, sectionName } = req.body;
+  if (!year || !sectionName) return next();
+
+  const student = db.prepare('SELECT branch_code FROM students WHERE university_id = ?').get(universityId);
+  if (!student || !student.branch_code) {
+    return res.status(400).send('This student has no branch saved yet, so a section cannot be assigned.');
+  }
+
+  const section = db.prepare(
+    'SELECT id FROM sections WHERE branch_code = ? AND year = ? AND section_name = ?'
+  ).get(student.branch_code, year, sectionName);
+
+  if (!section) {
+    return res.status(400).send('Year ' + year + ', Section ' + sectionName + ' does not exist for this branch.');
+  }
+
+  db.prepare('UPDATE students SET section_id = ? WHERE university_id = ?').run(section.id, universityId);
+  res.redirect('/admin-dashboard');
+});
 app.post('/admin/assign-section', requireAdmin, (req, res) => {
   const { universityId, sectionId } = req.body;
   db.prepare('UPDATE students SET section_id = ? WHERE university_id = ?')
@@ -343,25 +335,47 @@ app.get('/admin/add-student', requireAdmin, (req, res) => {
 });
 
 app.post('/admin/add-student', requireAdmin, async (req, res) => {
-  const { email, password, name, universityId } = req.body;
+  const { email, password, name } = req.body;
+  const universityId = (req.body.universityId || '').trim().toUpperCase();
+  const parseId = require('./idParser');
+
+  const showError = (message) => res.render('adminAddStudent', {
+    collegeName: COLLEGE_NAME,
+    admin: req.session.teacher,
+    error: message
+  });
+
+  let info;
+  try {
+    info = parseId(universityId);
+  } catch (err) {
+    return showError(err.message);
+  }
+
+  if (info.admissionType === 'Unknown') {
+    return showError('Roll number must have 1A (regular) or 5A (lateral) after the college code.');
+  }
+
+  const branch = db.prepare('SELECT code FROM branches WHERE roll_code = ? OR code = ?')
+    .get(info.branchCode, info.branchCode);
+
+  if (!branch) {
+    return showError('Branch code ' + info.branchCode + ' is not set up yet. Add its roll code first.');
+  }
 
   const existing = db.prepare('SELECT * FROM students WHERE email = ? OR university_id = ?')
     .get(email, universityId);
 
   if (existing) {
-    return res.render('adminAddStudent', {
-      collegeName: COLLEGE_NAME,
-      admin: req.session.teacher,
-      error: 'A student with that email or university ID already exists.'
-    });
+    return showError('A student with that email or university ID already exists.');
   }
 
   const hashed = await bcrypt.hash(password, 10);
 
   db.prepare(`
-    INSERT INTO students (email, password, name, university_id)
-    VALUES (?, ?, ?, ?)
-  `).run(email, hashed, name, universityId);
+    INSERT INTO students (email, password, name, university_id, joining_year, college_code, admission_type, branch_code, roll_suffix)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(email, hashed, name, universityId, info.joiningYear, info.collegeCode, info.admissionType, branch.code, info.rollSuffix);
 
   res.redirect('/admin-dashboard');
 });
@@ -535,12 +549,12 @@ app.post('/admin/add-teacher', requireAdmin, async (req, res) => {
 
 // ---------- Add Subject (admin) ----------
 app.post('/admin/add-subject', requireAdmin, (req, res) => {
-  const { name, branchCode, year } = req.body;
+  const { name, branchCode, year, semester } = req.body;
 
   db.prepare(`
-    INSERT INTO subjects (name, branch_code, year)
-    VALUES (?, ?, ?)
-  `).run(name, branchCode, year);
+    INSERT INTO subjects (name, branch_code, year, semester)
+    VALUES (?, ?, ?, ?)
+  `).run(name, branchCode, year, semester || 1);
 
   res.redirect('/admin-dashboard');
 });
@@ -671,6 +685,39 @@ app.get('/activities', (req, res) => {
     collegeName: COLLEGE_NAME,
     student: req.session.student,
     activities
+  });
+});
+app.get('/dashboard', (req, res) => {
+  res.locals.parseId = require('./idParser');
+  if (!req.session.student) {
+    return res.redirect('/login');
+  }
+
+  const student = db.prepare(`
+    SELECT students.*, branches.name AS branch_name,
+           sections.section_name, sections.year AS section_year
+    FROM students
+    LEFT JOIN branches ON students.branch_code = branches.code
+    LEFT JOIN sections ON students.section_id = sections.id
+    WHERE students.university_id = ?
+  `).get(req.session.student.universityId);
+
+  if (!student) {
+    return req.session.destroy(() => res.redirect('/login'));
+  }
+
+  const marks = db.prepare(`
+    SELECT subjects.name AS subject_name, marks.semester, marks.score, marks.max_score, marks.grade
+    FROM marks
+    JOIN subjects ON marks.subject_id = subjects.id
+    WHERE marks.student_id = ?
+    ORDER BY marks.semester
+  `).all(req.session.student.universityId);
+
+  res.render('dashboard', {
+    collegeName: COLLEGE_NAME,
+    student: student,
+    marks: marks
   });
 });
 // ---------- Start server ----------

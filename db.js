@@ -132,6 +132,11 @@ db.exec(`
   );
 `);
 
+// Add semester to subjects (1 or 2 within the year) if it is missing
+const subjectColumns = db.prepare('PRAGMA table_info(subjects)').all();
+if (!subjectColumns.some(c => c.name === 'semester')) {
+  db.exec('ALTER TABLE subjects ADD COLUMN semester INTEGER DEFAULT 1');
+}
 console.log('Database and all tables ready.');
 
 module.exports = db;
