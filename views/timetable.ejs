@@ -6,7 +6,7 @@
 <title>Timetable — <%= collegeName %></title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  :root { --dark:#2A0709; --red:#BF0716; --gold:#E2B229; --cream:#FBF8F4; --ink:#1B1614; --muted:#6E625A; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); }
   nav { background: var(--dark); color: white; padding: 16px 28px; border-bottom: 3px solid var(--gold); display:flex; justify-content:space-between; align-items:center; }
@@ -15,7 +15,7 @@
   h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 20px; }
   table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
   th { background: var(--dark); color: white; padding: 12px; font-size: 12px; text-transform: uppercase; }
-  td { padding: 0; border: 1px solid #EAE1D3; }
+  td { padding: 0; border: 1px solid #E9E1D6; }
   .period-cell {
     padding: 14px; cursor: pointer; transition: background 0.15s ease; min-height: 60px;
   }
@@ -30,12 +30,25 @@
   #modal { background: white; border-radius: 10px; padding: 28px; max-width: 380px; width: 90%; border-top: 4px solid var(--gold); }
   #modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 6px; }
   #modal .teacher { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
-  #modal .topic { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #EAE1D3; font-size: 13px; }
+  #modal .topic { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #E9E1D6; font-size: 13px; }
   #modal .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
   .badge.covered { background: #E7F5E9; color: #2E7D32; }
   .badge.pending { background: #FDECEA; color: var(--red); }
   #modal .close-btn { margin-top: 18px; width: 100%; padding: 10px; background: var(--dark); color: white; border: none; border-radius: 6px; cursor: pointer; }
+
+/* gradient-theme */
+body { background-image: linear-gradient(160deg, #FBF8F4 0%, #F4E9DA 100%); background-attachment: fixed; }
+nav { background: linear-gradient(120deg, #5C0810 0%, #8E0510 45%, #BF0716 100%) !important; border-bottom: 3px solid #E2B229 !important; }
+th { background: linear-gradient(120deg, #2A0709, #5C0810) !important; }
+button, .btn { background: linear-gradient(135deg, #BF0716 0%, #E8283A 100%) !important; transition: transform .15s ease, box-shadow .25s ease, filter .25s ease; }
+button:hover, .btn:hover { background: linear-gradient(135deg, #8E0510 0%, #BF0716 100%) !important; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(191,7,22,.3); }
+button:active, .btn:active { transform: translateY(0); box-shadow: none; }
+
+/* nav-crest */
+nav > div:first-child { display: flex; align-items: center; gap: 10px; }
+nav > div:first-child::before { content: ''; flex: none; width: 36px; height: 36px; border-radius: 50%; background: #fff url('/images/college-crest.png') center / 86% no-repeat; box-shadow: 0 0 0 2px #E2B229; }
 </style>
+  <link rel="icon" href="/images/college-crest.png">
 </head>
 <body>
 

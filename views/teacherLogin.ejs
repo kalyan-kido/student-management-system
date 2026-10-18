@@ -4,22 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faculty Login — <%= collegeName %></title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --dark:#14100D; --red:#B3211E; --gold:#E8B923; --cream:#FDF8F0; --ink:#1B1614; --muted:#7A6F63; }
+  :root { --dark:#2A0709; --red:#BF0716; --gold:#E2B229; --cream:#FBF8F4; --ink:#1B1614; --muted:#6E625A; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  body { font-family: 'Poppins', sans-serif; background: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .card { background: var(--cream); border-radius: 10px; padding: 40px 34px; width: 100%; max-width: 360px; text-align: center; border-top: 4px solid var(--red); }
   .card img { width: 64px; margin-bottom: 14px; }
-  .card h1 { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+  .card h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
   .card p.sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
-  input { width: 100%; padding: 12px; margin-bottom: 14px; border: 1px solid #DDD3C2; border-radius: 6px; font-family: inherit; font-size: 14px; background: white; }
+  input { width: 100%; padding: 12px; margin-bottom: 14px; border: 1px solid #D9CFC1; border-radius: 6px; font-family: inherit; font-size: 14px; background: white; }
   input:focus { outline: 2px solid var(--red); }
   button { width: 100%; padding: 13px; background: var(--dark); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; }
   button:hover { opacity: 0.92; }
   .error { background: #FDECEA; color: var(--red); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 14px; }
   .back { display: block; margin-top: 14px; color: var(--muted); font-size: 13px; text-decoration: none; }
+
+  /* ---- Login page motion ---- */
+  @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .card { animation: cardIn .6s cubic-bezier(.2,.7,.2,1) both; }
+  .card img { animation: fadeIn .8s ease .15s both; }
+  input { transition: border-color .25s ease, box-shadow .25s ease; }
+  input:focus { outline: none; border-color: #BF0716; box-shadow: 0 0 0 3px rgba(191,7,22,.18); }
+  button { transition: background-color .25s ease, transform .15s ease, box-shadow .25s ease; }
+  button:hover { opacity: 1; background: #8E0510; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(191,7,22,.28); }
+  button:active { transform: translateY(0); box-shadow: none; }
+  .error { animation: fadeIn .4s ease both; }
+  .back { transition: color .2s ease; }
+  .back:hover { color: #BF0716; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* college-login */
+  body { background: linear-gradient(135deg, rgba(20,4,5,0.90) 0%, rgba(142,5,16,0.80) 100%), url('/images/campus-hero.jpg') center / cover no-repeat fixed; }
+  button { background: linear-gradient(135deg, #BF0716 0%, #E8283A 100%); }
+  button:hover { background: linear-gradient(135deg, #8E0510 0%, #BF0716 100%); }
 </style>
+  <link rel="icon" href="/images/college-crest.png">
 </head>
 <body>
   <div class="card">

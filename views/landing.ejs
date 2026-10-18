@@ -8,13 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --dark: #14100D;
+    --dark: #2A0709;
     --dark-light: #241C16;
-    --red: #B3211E;
-    --gold: #E8B923;
-    --cream: #FDF8F0;
+    --red: #BF0716;
+    --gold: #E2B229;
+    --cream: #FBF8F4;
     --ink: #1B1614;
-    --muted: #7A6F63;
+    --muted: #6E625A;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -124,7 +124,7 @@
 
   .login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(179,33,30,0.35);
+    box-shadow: 0 8px 20px rgba(191,7,22,0.35);
   }
 
   .login-btn.secondary {
@@ -145,7 +145,7 @@
 
   .link-card {
     background: white;
-    border: 1px solid #EAE1D3;
+    border: 1px solid #E9E1D6;
     border-top: 3px solid var(--gold);
     border-radius: 8px;
     padding: 28px 20px;
@@ -170,15 +170,61 @@
     color: var(--muted);
     font-size: 13px;
     padding: 20px 0 40px;
-    border-top: 1px solid #EAE1D3;
+    border-top: 1px solid #E9E1D6;
   }
+
+  /* college-theme */
+  body { background: linear-gradient(180deg, #FBF8F4 0%, #F4E9DA 100%); }
+
+  #splash { background: #140405; overflow: hidden; }
+  #splash .splash-bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(20,4,5,0.55) 0%, rgba(142,5,16,0.80) 55%, rgba(20,4,5,0.95) 100%),
+      url('/images/campus-hero.jpg') center / cover no-repeat;
+    transform: scale(1.06);
+    animation: slowZoom 6s ease-out forwards;
+  }
+  #splash .splash-content { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px; }
+  #splash .splash-crest { width: 130px; height: 130px; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 0 0 3px #E2B229, 0 0 40px rgba(226,178,41,0.35); }
+  .splash-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(44px, 8vw, 76px); font-weight: 700; color: #fff; letter-spacing: 6px; margin-top: 22px; line-height: 1.1; text-shadow: 0 3px 18px rgba(0,0,0,0.55); animation: fadeUp 0.8s ease 0.2s both; }
+  .splash-sub { color: #E2B229; letter-spacing: 2.5px; text-transform: uppercase; font-size: clamp(12px, 2.2vw, 16px); margin-top: 8px; font-weight: 600; animation: fadeUp 0.8s ease 0.35s both; }
+  .splash-tag { color: rgba(255,255,255,0.88); margin-top: 14px; font-size: 15px; animation: fadeUp 0.8s ease 0.5s both; }
+  .splash-bar { width: min(320px, 70vw); height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-top: 26px; }
+  .splash-bar span { display: block; height: 100%; background: linear-gradient(90deg, #E2B229, #F6D365); animation: loadBar 2s ease forwards; }
+  @keyframes slowZoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+  @keyframes loadBar { from { width: 0; } to { width: 100%; } }
+
+  .hero {
+    background:
+      linear-gradient(180deg, rgba(20,4,5,0.45) 0%, rgba(142,5,16,0.72) 60%, rgba(20,4,5,0.92) 100%),
+      url('/images/campus-hero.jpg') center / cover no-repeat;
+    padding: 110px 20px 90px;
+    border-bottom: 4px solid #E2B229;
+  }
+  .crest { background: #fff; padding: 3px; box-shadow: 0 0 0 3px #E2B229, 0 8px 24px rgba(0,0,0,0.4); }
+  .hero h1 { text-shadow: 0 2px 14px rgba(0,0,0,0.55); }
+  .hero .location, .hero p.tagline { text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
+  .hero p.tagline { color: #fff; }
+  .login-btn { background: linear-gradient(135deg, #BF0716 0%, #E8283A 100%); }
+  .login-btn:hover { box-shadow: 0 8px 20px rgba(191,7,22,0.4); }
+  .login-btn.secondary { background: rgba(255,255,255,0.12); border: 1px solid #E2B229; color: #E2B229; }
+  .link-card { border-top: 3px solid #BF0716; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
 </style>
+  <link rel="icon" href="/images/college-crest.png">
 </head>
 <body>
 
   <div id="splash">
-    <img src="/images/college-crest.png" alt="College Crest">
-    <div class="splash-name">Avanthi Institute of Engineering<br>& Technology</div>
+    <div class="splash-bg"></div>
+    <div class="splash-content">
+      <img class="splash-crest" src="/images/college-crest.png" alt="College Crest">
+      <h1 class="splash-title">AVANTHI</h1>
+      <div class="splash-sub">Institute of Engineering &amp; Technology</div>
+      <div class="splash-tag">Student &amp; Faculty Portal</div>
+      <div class="splash-bar"><span></span></div>
+    </div>
   </div>
 
   <div class="hero">
@@ -214,7 +260,7 @@
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('splash').classList.add('hide');
-      }, 1000);
+      }, 2200);
     });
   </script>
 </body>
