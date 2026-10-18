@@ -311,10 +311,15 @@ app.post('/admin/assign-section', requireAdmin, (req, res) => {
 
 app.post('/admin/assign-teacher-subject', requireAdmin, (req, res) => {
   const { sectionId, subjectId, teacherId } = req.body;
-  db.prepare(`
-    INSERT INTO section_subjects (section_id, subject_id, teacher_id)
-    VALUES (?, ?, ?)
-  `).run(sectionId, subjectId, teacherId);
+  const already = db.prepare(
+    'SELECT id FROM section_subjects WHERE section_id = ? AND subject_id = ? AND teacher_id = ?'
+  ).get(sectionId, subjectId, teacherId);
+  if (!already) {
+    db.prepare(`
+      INSERT INTO section_subjects (section_id, subject_id, teacher_id)
+      VALUES (?, ?, ?)
+    `).run(sectionId, subjectId, teacherId);
+  }
   res.redirect('/admin-dashboard');
 });
 

@@ -292,6 +292,17 @@
     <h2>Section incharges</h2>
     <p class="hint">An incharge can enter marks for every subject in their section.</p>
     <div class="table-wrap">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+        <select id="f-branch" aria-label="Filter by branch"><option value="">All branches</option></select>
+        <select id="f-year" aria-label="Filter by year">
+          <option value="">All years</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+        </select>
+        <span id="f-note" class="muted"></span>
+      </div>
       <table>
         <thead>
           <tr><th>Section</th><th>Current incharge</th><th>Change incharge</th></tr>
@@ -303,7 +314,7 @@
           <% sections.forEach(sec => {
                const current = teachers.find(t => t.id == sec.incharge_id);
           %>
-            <tr>
+            <tr class="incharge-row" data-branch="<%= sec.branch_name %>" data-year="<%= sec.year %>" data-set="<%= current ? '1' : '0' %>">
               <td><%= sec.branch_name %>, Year <%= sec.year %>, Section <%= sec.section_name %></td>
               <td><%= current ? current.name : 'Not set' %></td>
               <td>
@@ -349,6 +360,37 @@
     </div>
   </section>
 </div>
+<script>
+(function () {
+  var rows = [].slice.call(document.querySelectorAll('.incharge-row'));
+  var b = document.getElementById('f-branch');
+  var y = document.getElementById('f-year');
+  var note = document.getElementById('f-note');
+  var names = [];
+  rows.forEach(function (r) { if (names.indexOf(r.dataset.branch) < 0) names.push(r.dataset.branch); });
+  names.forEach(function (n) {
+    var o = document.createElement('option');
+    o.value = n; o.textContent = n; b.appendChild(o);
+  });
+  function apply() {
+    var shown = 0;
+    var filtering = b.value || y.value;
+    rows.forEach(function (r) {
+      var ok = filtering
+        ? ((!b.value || r.dataset.branch === b.value) && (!y.value || r.dataset.year === y.value))
+        : r.dataset.set === '1';
+      r.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    note.textContent = filtering
+      ? shown + ' sections shown'
+      : 'Showing sections that already have an incharge. Pick a branch or year to see others.';
+  }
+  b.addEventListener('change', apply);
+  y.addEventListener('change', apply);
+  apply();
+})();
+</script>
 </body>
 </html>
 
