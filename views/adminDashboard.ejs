@@ -99,6 +99,7 @@ tbody tr:hover { background-color: rgba(191,7,22,0.05); }
   <div class="links">
     <a href="/admin/add-student">Add Student</a>
     <a href="/admin/add-teacher">Add Teacher</a>
+    <a href="/admin/password-requests">Password requests<% if (typeof pendingResets !== 'undefined' && pendingResets) { %> (<%= pendingResets %>)<% } %></a>
     <a href="/teacher/achievements">Achievements</a>
     <a href="/teacher/activities">Activities</a>
     <a href="/teacher-logout">Log out</a>

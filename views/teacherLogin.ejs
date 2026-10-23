@@ -51,6 +51,9 @@
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+  .forgot { display: block; margin-top: 14px; font-size: 13px; color: #BF0716; text-decoration: none; transition: color .2s ease; }
+  .forgot:hover { color: #8E0510; text-decoration: underline; }
 </style>
   <link rel="icon" href="/images/college-crest.png">
 </head>
@@ -69,6 +72,8 @@
       <input type="password" name="password" placeholder="Password" required>
       <button type="submit">Log In</button>
     </form>
+
+    <a class="forgot" href="/forgot-password?type=teacher">Forgot password?</a>
 
     <a href="/" class="back">← Back to home</a>
     <a href="/login" class="back">Student? Log in here</a>

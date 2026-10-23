@@ -28,6 +28,8 @@ require('./passwordRoutes')(app, {
   requireAdmin: (req, res, next) => requireAdmin(req, res, next)
 });
 
+require('./forcePasswordChange')(app, db);
+
 // ---------- Landing page ----------
 app.get('/', (req, res) => {
   res.render('landing', {
@@ -49,7 +51,7 @@ app.post('/login', async (req, res) => {
   if (!student) {
     return res.render('login', {
       collegeName: COLLEGE_NAME,
-      error: 'No account found with that email.'
+      error: 'Incorrect email or password.'
     });
   }
 
@@ -58,7 +60,7 @@ app.post('/login', async (req, res) => {
   if (!passwordMatches) {
     return res.render('login', {
       collegeName: COLLEGE_NAME,
-      error: 'Incorrect password.'
+      error: 'Incorrect email or password.'
     });
   }
 
@@ -114,7 +116,7 @@ app.post('/teacher-login', async (req, res) => {
   if (!teacher) {
     return res.render('teacherLogin', {
       collegeName: COLLEGE_NAME,
-      error: 'No staff account found with that email.'
+      error: 'Incorrect email or password.'
     });
   }
 
@@ -123,7 +125,7 @@ app.post('/teacher-login', async (req, res) => {
   if (!passwordMatches) {
     return res.render('teacherLogin', {
       collegeName: COLLEGE_NAME,
-      error: 'Incorrect password.'
+      error: 'Incorrect email or password.'
     });
   }
 
