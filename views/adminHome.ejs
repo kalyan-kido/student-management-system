@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin home | <%= collegeName %></title>
+<link rel="icon" href="/images/college-crest.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --dark:#2A0709; --red:#BF0716; --gold:#E2B229; --cream:#FBF8F4; --ink:#1B1614; --muted:#6E625A; --line:#E9E1D6; --ok:#2E7D32; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background-image: linear-gradient(160deg, #FBF8F4 0%, #F4E9DA 100%); background-attachment: fixed; color: var(--ink); line-height: 1.5; }
+  nav { background: linear-gradient(120deg, #5C0810 0%, #8E0510 45%, #BF0716 100%); color: #fff; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 28px; border-bottom: 3px solid var(--gold); flex-wrap: wrap; }
+  nav .brand { font-family: 'Cormorant Garamond', serif; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+  nav .brand::before { content: ''; flex: none; width: 36px; height: 36px; border-radius: 50%; background: #fff url('/images/college-crest.png') center / 86% no-repeat; box-shadow: 0 0 0 2px var(--gold); }
+  nav .links { display: flex; gap: 20px; flex-wrap: wrap; }
+  nav a { color: var(--gold); text-decoration: none; font-size: 13px; position: relative; transition: color .2s ease; }
+  nav a:hover { color: #fff; }
+  nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -5px; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .28s ease; }
+  nav a:hover::after { transform: scaleX(1); }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 20px 64px; }
+  .container > * { animation: riseIn .55s cubic-bezier(.2,.7,.2,1) both; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: 30px; }
+  p.sub { color: var(--muted); margin-top: 4px; font-size: 14px; }
+  section.block { margin-top: 36px; }
+  section.block h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+  section.block p.hint { color: var(--muted); font-size: 13px; margin: 2px 0 14px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-top: 24px; }
+  .stat { background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--red); border-radius: 8px; padding: 16px; animation: riseIn .5s cubic-bezier(.2,.7,.2,1) both; }
+  .stat:nth-child(2) { animation-delay: .08s; } .stat:nth-child(3) { animation-delay: .16s; } .stat:nth-child(4) { animation-delay: .24s; }
+  .stat .num { font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1.1; }
+  .stat .label { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; min-width: 520px; }
+  th { background: linear-gradient(120deg, #2A0709, #5C0810); color: #fff; padding: 12px; text-align: left; font-size: 12px; font-weight: 600; }
+  td { padding: 10px 12px; border-top: 1px solid var(--line); font-size: 14px; }
+  th:first-child, td:first-child { padding-left: 16px; }
+  tbody tr { transition: background-color .2s ease; }
+  tbody tr:hover { background-color: rgba(191,7,22,0.05); }
+  td.empty { color: var(--muted); text-align: center; padding: 22px 12px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; transition: box-shadow .3s ease; animation: riseIn .5s cubic-bezier(.2,.7,.2,1) both; }
+  .card:hover { box-shadow: 0 12px 28px rgba(20,4,5,0.10); }
+  .card h3 { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .badge.warn { background: #FDECEA; color: #C62828; }
+  .badge.ok { background: #E8F5E9; color: var(--ok); }
+  .card ul { margin: 10px 0 0 18px; font-size: 13px; }
+  .card li { margin-bottom: 3px; }
+  .card p { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .card a { color: var(--red); }
+  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @view-transition { navigation: auto; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand"><%= collegeName %></div>
+  <div class="links">
+    <a href="/admin-home">Home</a>
+    <a href="/admin-dashboard">Full dashboard</a>
+    <a href="/admin/add-student">Add Student</a>
+    <a href="/admin/add-teacher">Add Teacher</a>
+    <a href="/admin/password-requests">Password requests<% if (typeof pendingResets !== 'undefined' && pendingResets) { %> (<%= pendingResets %>)<% } %></a>
+    <a href="/teacher-logout">Log out</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div>
+    <h1>Admin home</h1>
+    <p class="sub">Signed in as <%= admin.name %></p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num"><%= counts.students %></div><div class="label">Students</div></div>
+    <div class="stat"><div class="num"><%= counts.teachers %></div><div class="label">Teachers</div></div>
+    <div class="stat"><div class="num"><%= counts.branches %></div><div class="label">Branches</div></div>
+    <div class="stat"><div class="num"><%= counts.sectionsInUse %> <span style="font-size:16px;color:var(--muted)">of <%= counts.sections %></span></div><div class="label">Sections in use</div></div>
+  </div>
+
+  <section class="block">
+    <h2>Students per branch and year</h2>
+    <p class="hint">Year is worked out from each roll number and today's date.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Branch</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Other</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <% const names = Object.keys(strength).sort(); %>
+          <% if (names.length === 0) { %>
+            <tr><td class="empty" colspan="7">No students yet.</td></tr>
+          <% } %>
+          <% names.forEach(n => { %>
+            <tr>
+              <td><%= n %></td>
+              <td><%= strength[n][1] %></td>
+              <td><%= strength[n][2] %></td>
+              <td><%= strength[n][3] %></td>
+              <td><%= strength[n][4] %></td>
+              <td><%= strength[n].other %></td>
+              <td><strong><%= strength[n].total %></strong></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Needs attention</h2>
+    <p class="hint">Things to fix so students and teachers see correct information.</p>
+    <div class="cards">
+
+      <div class="card">
+        <h3>Students waiting for a section <span class="badge <%= waiting ? 'warn' : 'ok' %>"><%= waiting ? waiting : 'All clear' %></span></h3>
+        <% if (waiting) { %><p>Assign them on the <a href="/admin-dashboard">full dashboard</a>.</p><% } %>
+      </div>
+
+      <div class="card">
+        <h3>Sections with students but no incharge <span class="badge <%= noIncharge.length ? 'warn' : 'ok' %>"><%= noIncharge.length ? noIncharge.length : 'All clear' %></span></h3>
+        <% if (noIncharge.length) { %>
+          <ul>
+            <% noIncharge.forEach(s => { %>
+              <li><%= s.branch_name %>, Year <%= s.year %>, Section <%= s.section_name %> (<%= s.student_count %> <%= s.student_count === 1 ? 'student' : 'students' %>)</li>
+            <% }) %>
+          </ul>
+          <p>Set them under Section incharges on the <a href="/admin-dashboard">full dashboard</a>.</p>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Subjects with no teacher <span class="badge <%= noTeacher.length ? 'warn' : 'ok' %>"><%= noTeacher.length ? noTeacher.length : 'All clear' %></span></h3>
+        <% if (noTeacher.length) { %>
+          <ul>
+            <% noTeacher.forEach(s => { %>
+              <li><%= s.name %> (Year <%= s.year %>, Sem <%= s.semester || 1 %>)</li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Section year differs from roll number <span class="badge <%= yearMismatch.length ? 'warn' : 'ok' %>"><%= yearMismatch.length ? yearMismatch.length : 'All clear' %></span></h3>
+        <% if (yearMismatch.length) { %>
+          <ul>
+            <% yearMismatch.forEach(m => { %>
+              <li><a href="/admin/edit-student/<%= m.id %>"><%= m.name %></a>: roll number says Year <%= m.calculated %>, section is Year <%= m.assigned %> <%= m.section %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Branches missing a roll code <span class="badge <%= noRollCode.length ? 'warn' : 'ok' %>"><%= noRollCode.length ? noRollCode.length : 'All clear' %></span></h3>
+        <% if (noRollCode.length) { %>
+          <ul>
+            <% noRollCode.forEach(b => { %><li><%= b.name %></li><% }) %>
+          </ul>
+          <p>Students from these branches cannot be added until the 2-digit roll code is set.</p>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Students with no phone number <span class="badge <%= noPhone.length ? 'warn' : 'ok' %>"><%= noPhone.length ? noPhone.length : 'All clear' %></span></h3>
+        <% if (noPhone.length) { %>
+          <ul>
+            <% noPhone.slice(0, 8).forEach(s => { %>
+              <li><a href="/admin/edit-student/<%= s.id %>"><%= s.name %></a></li>
+            <% }) %>
+            <% if (noPhone.length > 8) { %><li>and <%= noPhone.length - 8 %> more</li><% } %>
+          </ul>
+        <% } %>
+      </div>
+
+    </div>
+  </section>
+</div>
+</body>
+</html>

@@ -21,6 +21,8 @@ app.use(session({
   saveUninitialized: false
 }));
 
+require('./selfServiceReset')(app, { db: db, bcrypt: bcrypt, COLLEGE_NAME: COLLEGE_NAME });
+
 require('./passwordRoutes')(app, {
   db: db,
   bcrypt: bcrypt,
@@ -29,6 +31,13 @@ require('./passwordRoutes')(app, {
 });
 
 require('./forcePasswordChange')(app, db);
+
+require('./adminHome')(app, {
+  db: db,
+  COLLEGE_NAME: COLLEGE_NAME,
+  requireAdmin: (req, res, next) => requireAdmin(req, res, next),
+  parseId: require('./idParser')
+});
 
 // ---------- Landing page ----------
 app.get('/', (req, res) => {

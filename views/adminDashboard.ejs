@@ -97,6 +97,7 @@ tbody tr:hover { background-color: rgba(191,7,22,0.05); }
 <nav>
   <div class="brand"><%= collegeName %></div>
   <div class="links">
+    <a href="/admin-home">Home</a>
     <a href="/admin/add-student">Add Student</a>
     <a href="/admin/add-teacher">Add Teacher</a>
     <a href="/admin/password-requests">Password requests<% if (typeof pendingResets !== 'undefined' && pendingResets) { %> (<%= pendingResets %>)<% } %></a>
