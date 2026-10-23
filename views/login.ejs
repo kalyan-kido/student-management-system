@@ -98,6 +98,16 @@
 
   /* brand-logo */
   .card img.brand-logo { width: 100%; max-width: 290px; height: auto; margin: 0 auto 12px; display: block; mix-blend-mode: multiply; }
+
+/* page-transition */
+@view-transition { navigation: auto; }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(12px); } }
+::view-transition-old(root) { animation: .22s ease both vtOut; }
+::view-transition-new(root) { animation: .4s ease both vtIn; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 </style>
   <link rel="icon" href="/images/college-crest.png">
 </head>

@@ -47,6 +47,39 @@ button:active, .btn:active { transform: translateY(0); box-shadow: none; }
 /* nav-crest */
 nav > div:first-child { display: flex; align-items: center; gap: 10px; }
 nav > div:first-child::before { content: ''; flex: none; width: 36px; height: 36px; border-radius: 50%; background: #fff url('/images/college-crest.png') center / 86% no-repeat; box-shadow: 0 0 0 2px #E2B229; }
+
+/* page-transition */
+@view-transition { navigation: auto; }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(12px); } }
+::view-transition-old(root) { animation: .22s ease both vtOut; }
+::view-transition-new(root) { animation: .4s ease both vtIn; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+/* motion-theme */
+@keyframes riseIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.container > * { animation: riseIn .55s cubic-bezier(.2,.7,.2,1) both; }
+.container > *:nth-child(2) { animation-delay: .07s; }
+.container > *:nth-child(3) { animation-delay: .14s; }
+.container > *:nth-child(4) { animation-delay: .21s; }
+.container > *:nth-child(5) { animation-delay: .28s; }
+.container > *:nth-child(n+6) { animation-delay: .35s; }
+.info-grid > *, .stats > *, .cards > * { animation: riseIn .5s cubic-bezier(.2,.7,.2,1) both; }
+.info-grid > *:nth-child(2), .stats > *:nth-child(2), .cards > *:nth-child(2) { animation-delay: .08s; }
+.info-grid > *:nth-child(3), .stats > *:nth-child(3), .cards > *:nth-child(3) { animation-delay: .16s; }
+.info-grid > *:nth-child(n+4), .stats > *:nth-child(n+4), .cards > *:nth-child(n+4) { animation-delay: .24s; }
+nav .links a { position: relative; transition: color .2s ease; }
+nav .links a:hover { text-decoration: none; color: #fff; }
+nav .links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -5px; height: 2px; background: #E2B229; transform: scaleX(0); transform-origin: left; transition: transform .28s ease; }
+nav .links a:hover::after { transform: scaleX(1); }
+tbody tr { transition: background-color .2s ease; }
+tbody tr:hover { background-color: rgba(191,7,22,0.05); }
+.table-wrap, form.stack { transition: box-shadow .3s ease; }
+.table-wrap:hover, form.stack:hover { box-shadow: 0 12px 28px rgba(20,4,5,0.10); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
   <link rel="icon" href="/images/college-crest.png">
 </head>

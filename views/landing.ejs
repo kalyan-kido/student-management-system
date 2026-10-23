@@ -211,6 +211,21 @@
   .login-btn.secondary { background: rgba(255,255,255,0.12); border: 1px solid #E2B229; color: #E2B229; }
   .link-card { border-top: 3px solid #BF0716; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+
+  /* banner-strip */
+  .banner-strip { max-width: 1100px; margin: -48px auto 0; padding: 0 20px; position: relative; z-index: 2; }
+  .banner-strip img { width: 100%; height: auto; display: block; border-radius: 14px; border: 3px solid #E2B229; box-shadow: 0 20px 44px rgba(20,4,5,0.38); animation: bannerRise .9s cubic-bezier(.2,.7,.2,1) .15s both; }
+  @keyframes bannerRise { from { opacity: 0; transform: translateY(26px) scale(.985); } to { opacity: 1; transform: none; } }
+  .quick-links { padding-top: 40px; }
+/* page-transition */
+@view-transition { navigation: auto; }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(12px); } }
+::view-transition-old(root) { animation: .22s ease both vtOut; }
+::view-transition-new(root) { animation: .4s ease both vtIn; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 </style>
   <link rel="icon" href="/images/college-crest.png">
 </head>
@@ -235,6 +250,8 @@
     <a href="/login" class="login-btn">Student Log In</a>
     <a href="/teacher-login" class="login-btn secondary">Faculty Log In</a>
   </div>
+
+  <div class="banner-strip"><img src="/images/campus-splash.jpg" width="1920" height="768" alt="Avanthi Institute of Engineering and Technology, Vizianagaram"></div>
 
   <div class="quick-links">
     <a href="/timetable" class="link-card">

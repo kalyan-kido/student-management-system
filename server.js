@@ -21,6 +21,13 @@ app.use(session({
   saveUninitialized: false
 }));
 
+require('./passwordRoutes')(app, {
+  db: db,
+  bcrypt: bcrypt,
+  COLLEGE_NAME: COLLEGE_NAME,
+  requireAdmin: (req, res, next) => requireAdmin(req, res, next)
+});
+
 // ---------- Landing page ----------
 app.get('/', (req, res) => {
   res.render('landing', {
